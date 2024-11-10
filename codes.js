@@ -1,23 +1,24 @@
 const pythonCodes = {
-    button1: `import socket
-# Client Code for TCP connection
-client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client_socket.connect(('localhost', 3000))
-client_socket.send("Hello from client!".encode())
-response = client_socket.recv(1024).decode()
-print("Server response:", response)
-client_socket.close()
+    button1: `def sender():
+    res = ""
+    n = int(input("Enter number of frames: "))
+    for i in range(n):
+        frame = input(f"Enter frame {i + 1}: ")
+        res += f"{len(frame)}{frame}"
+    print("Final message:", res)
+    return res
 
-# Server Code for TCP connection
-server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_socket.bind(('localhost', 3000))
-server_socket.listen(1)
-connection, client_address = server_socket.accept()
-data = connection.recv(1024).decode()
-print("Received from client:", data)
-connection.send("Hello from server!".encode())
-connection.close()
-server_socket.close()`,
+def receiver(res):
+    print("Received frames:")
+    i = 0
+    while i < len(res):
+        len_frame = int(res[i])
+        print(res[i + 1:i + 1 + len_frame])
+        i += 1 + len_frame
+
+# Calling the functions
+res = sender()
+receiver(res)`,
 
     button2: `import socket
 # UDP Client
