@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Copy Python Code to Clipboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            text-align: center;
+        }
+        .btn-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 20px;  /* Set padding for height and width */
+            font-size: 14px;      /* Slightly smaller font size */
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            width: 200px;         /* Set a fixed width */
+            height: 45px;         /* Slightly larger height */
+            margin: 0 auto;       /* Center the button horizontally */
+            text-align: center;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #message {
+            margin-top: 20px;
+            font-weight: bold;
+            color: #28a745;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Click a Button to Copy Python Code</h1>
+
+    <div class="btn-container">
+        <button id="button1" onclick="copyPythonCode('Button 1')">Copy Client-Server Socket Code</button>
+        <button id="button2" onclick="copyPythonCode('Button 2')">Copy UDP Client-Server Code</button>
+        <button onclick="copyPythonCode('Button 3')">Copy Python Code 3</button>
+        <button onclick="copyPythonCode('Button 4')">Copy Python Code 4</button>
+        <button onclick="copyPythonCode('Button 5')">Copy Python Code 5</button>
+        <button onclick="copyPythonCode('Button 6')">Copy Python Code 6</button>
+        <button onclick="copyPythonCode('Button 7')">Copy Python Code 7</button>
+    </div>
+
+    <div id="message"></div>
+
+    <script>
+        function copyPythonCode(button) {
+            var pythonCode;
+
+            // Define the Python code for Button 1 (Client-Server Socket Program)
+            if (button === 'Button 1') {
+                pythonCode = `import socket
+
+# Create the client socket and connect to the server
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client_socket.connect(('localhost', 3000))
+
+# Send a message to the server
+client_socket.send("Hello from client!".encode())
+
+# Receive and print the server's response
+response = client_socket.recv(1024).decode()
+print("Server response:", response)
+
+# Close the connection
+client_socket.close()
+
+import socket
+# Create and bind the server socket
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server_socket.bind(('localhost', 3000))
+server_socket.listen(1)  # Listen for incoming connections
+print("Server listening on port 3000...")
+
+# Accept a connection from the client
+connection, client_address = server_socket.accept()
+print("Connection from:", client_address)
+
+# Receive and print data from the client
+data = connection.recv(1024).decode()
+print("Received from client:", data)
+
+# Send a response to the client
+connection.send("Hello from server!".encode())
+
+# Close the connection
+connection.close()
+server_socket.close()`;
+            } else if (button === 'Button 2') {
+                pythonCode = `import socket
+
+# Create the client UDP socket
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+# Send a message to the server
+message = "Hello from UDP client!"
+client_socket.sendto(message.encode(), ('localhost', 3001))  # Send to server at localhost:3001
+
+# Receive a response from the server
+data, server_address = client_socket.recvfrom(1024)
+print("Received from server:", data.decode())
+
+# Close the client socket
+client_socket.close()
+
+import socket
+
+# Create the server UDP socket
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+server_socket.bind(('localhost', 3001))  # Bind to localhost on port 3001
+print("UDP Server listening on port 3001...")
+
+# Receive a message from the client
+data, client_address = server_socket.recvfrom(1024)  # Buffer size is 1024 bytes
+print("Received from client:", data.decode())
+
+# Send a response back to the client
+server_socket.sendto("Hello from UDP server!".encode(), client_address)`;
+            } else if (button === 'Button 3') {
+                pythonCode = # Python code for Button 3;
+            } else if (button === 'Button 4') {
+                pythonCode = # Python code for Button 4;
+            } else if (button === 'Button 5') {
+                pythonCode = # Python code for Button 5;
+            } else if (button === 'Button 6') {
+                pythonCode = # Python code for Button 6;
+            } else if (button === 'Button 7') {
+                pythonCode = # Python code for Button 7;
+            }
+
+            // Create a temporary textarea to hold the code and copy it to the clipboard
+            var tempTextArea = document.createElement("textarea");
+            tempTextArea.value = pythonCode;
+            document.body.appendChild(tempTextArea);
+
+            // Select and copy the text
+            tempTextArea.select();
+            tempTextArea.setSelectionRange(0, 99999); // For mobile devices
+
+            // Using document.execCommand() for copying
+            try {
+                var successful = document.execCommand('copy');
+                if (successful) {
+                    document.getElementById("message").innerText = Python code copied to clipboard!;
+                } else {
+                    document.getElementById("message").innerText = Failed to copy code.;
+                }
+            } catch (err) {
+                document.getElementById("message").innerText = Error copying code: ${err};
+            }
+
+            // Remove the textarea after copying
+            document.body.removeChild(tempTextArea);
+
+            // Optionally clear the message after a few seconds
+            setTimeout(function() {
+                document.getElementById("message").innerText = "";
+            }, 3000);
+        }
+    </script>
+
+</body>
+</html>
