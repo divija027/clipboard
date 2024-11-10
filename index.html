@@ -17,16 +17,16 @@
             margin: 20px 0;
         }
         button {
-            padding: 10px 20px;  /* Set padding for height and width */
-            font-size: 14px;      /* Slightly smaller font size */
+            padding: 10px 20px;
+            font-size: 14px;
             cursor: pointer;
             background-color: #4CAF50;
             color: white;
             border: none;
             border-radius: 5px;
-            width: 200px;         /* Set a fixed width */
-            height: 45px;         /* Slightly larger height */
-            margin: 0 auto;       /* Center the button horizontally */
+            width: 200px;
+            height: 45px;
+            margin: 0 auto;
             text-align: center;
         }
         button:hover {
@@ -57,9 +57,9 @@
 
     <script>
         function copyPythonCode(button) {
-            var pythonCode;
+            let pythonCode;
 
-            // Define the Python code for Button 1 (Client-Server Socket Program)
+            // Define the Python code for each button
             if (button === 'Button 1') {
                 pythonCode = `import socket
 
@@ -81,7 +81,7 @@ import socket
 # Create and bind the server socket
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_socket.bind(('localhost', 3000))
-server_socket.listen(1)  # Listen for incoming connections
+server_socket.listen(1)
 print("Server listening on port 3000...")
 
 # Accept a connection from the client
@@ -106,7 +106,7 @@ client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 # Send a message to the server
 message = "Hello from UDP client!"
-client_socket.sendto(message.encode(), ('localhost', 3001))  # Send to server at localhost:3001
+client_socket.sendto(message.encode(), ('localhost', 3001))
 
 # Receive a response from the server
 data, server_address = client_socket.recvfrom(1024)
@@ -119,53 +119,44 @@ import socket
 
 # Create the server UDP socket
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-server_socket.bind(('localhost', 3001))  # Bind to localhost on port 3001
+server_socket.bind(('localhost', 3001))
 print("UDP Server listening on port 3001...")
 
 # Receive a message from the client
-data, client_address = server_socket.recvfrom(1024)  # Buffer size is 1024 bytes
+data, client_address = server_socket.recvfrom(1024)
 print("Received from client:", data.decode())
 
 # Send a response back to the client
 server_socket.sendto("Hello from UDP server!".encode(), client_address)`;
             } else if (button === 'Button 3') {
-                pythonCode = # Python code for Button 3;
+                pythonCode = "# Python code for Button 3";
             } else if (button === 'Button 4') {
-                pythonCode = # Python code for Button 4;
+                pythonCode = "# Python code for Button 4";
             } else if (button === 'Button 5') {
-                pythonCode = # Python code for Button 5;
+                pythonCode = "# Python code for Button 5";
             } else if (button === 'Button 6') {
-                pythonCode = # Python code for Button 6;
+                pythonCode = "# Python code for Button 6";
             } else if (button === 'Button 7') {
-                pythonCode = # Python code for Button 7;
+                pythonCode = "# Python code for Button 7";
             }
 
-            // Create a temporary textarea to hold the code and copy it to the clipboard
-            var tempTextArea = document.createElement("textarea");
+            const tempTextArea = document.createElement("textarea");
             tempTextArea.value = pythonCode;
             document.body.appendChild(tempTextArea);
 
-            // Select and copy the text
             tempTextArea.select();
-            tempTextArea.setSelectionRange(0, 99999); // For mobile devices
+            tempTextArea.setSelectionRange(0, 99999);
 
-            // Using document.execCommand() for copying
             try {
-                var successful = document.execCommand('copy');
-                if (successful) {
-                    document.getElementById("message").innerText = Python code copied to clipboard!;
-                } else {
-                    document.getElementById("message").innerText = Failed to copy code.;
-                }
+                const successful = document.execCommand('copy');
+                document.getElementById("message").innerText = successful ? "Python code copied to clipboard!" : "Failed to copy code.";
             } catch (err) {
-                document.getElementById("message").innerText = Error copying code: ${err};
+                document.getElementById("message").innerText = `Error copying code: ${err}`;
             }
 
-            // Remove the textarea after copying
             document.body.removeChild(tempTextArea);
 
-            // Optionally clear the message after a few seconds
-            setTimeout(function() {
+            setTimeout(() => {
                 document.getElementById("message").innerText = "";
             }, 3000);
         }
