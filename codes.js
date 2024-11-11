@@ -35,7 +35,28 @@ data, client_address = server_socket.recvfrom(1024)
 print("Received from client:", data.decode())
 server_socket.sendto("Hello from UDP server!".encode(), client_address)`,
 
-    button3: "# Python code for Button 3",
+    button3: 'import time
+import random
+
+def leaky_bucket(pkt_size, output_rate):
+    if pkt_size > 512:
+        print("Bucket overflow")
+    else:
+        while pkt_size > output_rate:
+            print(f"{output_rate} bytes sent")
+            pkt_size -= output_rate
+            time.sleep(0.1)
+        if pkt_size > 0:
+            print(f"{pkt_size} bytes sent")
+
+output_rate = int(input("Enter output rate: "))
+n = int(input("Enter number of packets: "))
+
+for i in range(n):
+    pkt_size = random.randint(1, 1000)
+    print(f"Packet {i+1} size: {pkt_size}")
+    leaky_bucket(pkt_size, output_rate)
+',
     button4: "# Python code for Button 4",
     button5: "# Python code for Button 5",
     button6: "# Python code for Button 6",
