@@ -20,19 +20,28 @@ res = sender()
 receiver(res)`,
 
     button2: `import socket
-# UDP Client
-client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-client_socket.sendto("Hello from UDP client!".encode(), ('localhost', 3001))
-data, server_address = client_socket.recvfrom(1024)
-print("Received from server:", data.decode())
-client_socket.close()
 
-# UDP Server
-server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-server_socket.bind(('localhost', 3001))
-data, client_address = server_socket.recvfrom(1024)
-print("Received from client:", data.decode())
-server_socket.sendto("Hello from UDP server!".encode(), client_address)`,
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s.bind(('localhost', 7999))
+print("Server is running")
+while True:
+    data, addr = s.recvfrom(1024)
+    msg = data.decode().upper()
+    s.sendto(msg.encode(), addr)
+
+
+import socket
+
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+server_addr = ('localhost', 7999)
+while True:
+    msg = input("Enter message (or 'END' to stop): ")
+    if msg == "END":
+        break
+    s.sendto(msg.encode(), server_addr)
+    print("Server:", s.recv(1024).decode())
+
+s.close()`,
 
     button3: `import time
 import random
