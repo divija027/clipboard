@@ -23,134 +23,366 @@ const pythonCodes = {
     }
 }`,
 
-    button2: `import socket
+    button2: `Button b1,b2,b3,b4;
+    TextView res;
+    EditText n1,n2;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_main);
+        n1 = findViewById(R.id.num1);
+        n2 = findViewById(R.id.num2);
+        b1 = findViewById(R.id.add);
+        b2 = findViewById(R.id.sub);
+        b3 = findViewById(R.id.mul);
+        b4 = findViewById(R.id.div);
+        res = findViewById(R.id.t1);
+        b1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int a1 = Integer.parseInt(n1.getText().toString());
+                int a2 = Integer.parseInt(n2.getText().toString());
+                int result = a1 + a2;
+                res.setText("Result:" +result);
+            }
+        });
+        b2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int a1 = Integer.parseInt(n1.getText().toString());
+                int a2 = Integer.parseInt(n2.getText().toString());
+                int result = a1 - a2;
+                res.setText("Result:" +result);
+            }
+        });
+        b3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int a1 = Integer.parseInt(n1.getText().toString());
+                int a2 = Integer.parseInt(n2.getText().toString());
+                int result = a1 * a2;
+                res.setText("Result:" +result);
+            }
+        });
+        b4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int a1 = Integer.parseInt(n1.getText().toString());
+                int a2 = Integer.parseInt(n2.getText().toString());
+                if (a2 == 0) {
+                    res.setText("Cannot divide by 0");
+                }
+                else {
+                    int result = a1 / a2;
+                    res.setText("Result:" + result);
+                }
+            }
+        });
 
-s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-s.bind(('localhost', 7999))
-print("Server is running")
-while True:
-    data, addr = s.recvfrom(1024)
-    msg = data.decode().upper()
-    s.sendto(msg.encode(), addr)
+    }
+}
 
+Calculator`,
 
-import socket
+    button3: `RadioGroup r;
+ConstraintLayout ly;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_main);
+        r = findViewById(R.id.rg);
+        ly = findViewById(R.id.l);
+        r.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                if (i==R.id.red)
+                    ly.setBackgroundColor(Color.RED);
+                else if (i==R.id.green)
+                    ly.setBackgroundColor(Color.GREEN);
+                else
+                    ly.setBackgroundColor(Color.BLUE);
+            }
+        });
+    }
+}
 
-s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-server_addr = ('localhost', 7999)
-while True:
-    msg = input("Enter message (or 'END' to stop): ")
-    if msg == "END":
-        break
-    s.sendto(msg.encode(), server_addr)
-    print("Server:", s.recv(1024).decode())
-
-s.close()`,
-
-    button3: `import time
-import random
-
-def leaky_bucket(pkt_size, output_rate):
-    if pkt_size > 512:
-        print("Bucket overflow")
-    else:
-        while pkt_size > output_rate:
-            print(f"{output_rate} bytes sent")
-            pkt_size -= output_rate
-            time.sleep(0.1)
-        if pkt_size > 0:
-            print(f"{pkt_size} bytes sent")
-
-output_rate = int(input("Enter output rate: "))
-n = int(input("Enter number of packets: "))
-
-for i in range(n):
-    pkt_size = random.randint(1, 1000)
-    print(f"Packet {i+1} size: {pkt_size}")
-    leaky_bucket(pkt_size, output_rate)`,
+Radio button`,
         
-    button4: `import socket
+    button4: `TextView t;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_main);
 
-s = socket.socket()
-s.bind(('localhost', 2111))
-s.listen(1)
+    }
 
-conn, _ = s.accept()
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.optionsmenu,menu);
+        return super.onCreateOptionsMenu(menu);
+    }
 
-while True:
-    data = conn.recv(1024).decode() 
-    if data.lower() == "goodbye":
-        break   
-    print("Client:", data)    
-    reply = input("Reply: ")   
-    conn.send(reply.encode())
-conn.close()
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        t = findViewById(R.id.tv);
+        int id = item.getItemId();
+        if (id == R.id.settings){
+            t.setText("Settings selected");
+            //Toast.makeText(this, "Settings selected", Toast.LENGTH_SHORT).show();
 
-import socket
+        } else if (id == R.id.history) {
+            //Toast.makeText(this, "History selected", Toast.LENGTH_SHORT).show();
+            t.setText("History selected");
+        }
+        else {
+            //Toast.makeText(this, "About selected", Toast.LENGTH_SHORT).show();
+            t.setText("About selected");
+        }
+        return super.onOptionsItemSelected(item);
+    }
+}
 
-s = socket.socket()
-s.connect(('localhost', 2111))
-
-while True:
-    msg = input("Message to server: ")
-    s.send(msg.encode())
-    if msg.lower() == "goodbye":
-        break
-    print("Server:", s.recv(1024).decode())
-s.close()`,
+Option menu`,
         
-    button5: `//RECEIVER
-import socket
+    button5: `ImageView i;
+Button b;
+int[] images = {R.drawable.elephnant, R.drawable.moon, R.drawable.rose};
+int currentIndex = 0;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_main);
+        i = findViewById(R.id.image);
+        b = findViewById(R.id.cb);
+        b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (currentIndex > 2)
+                    currentIndex = 0;
+                i.setImageResource(images[currentIndex]);
+                currentIndex = currentIndex + 1;
+            }
+        });
+    }
+}
 
-s = socket.socket()
-s.bind(('localhost', 6869))
-s.listen(1)
-conn, _ = s.accept()
-data = conn.recv(1024).decode()
-unstuffed = data[8:-8].replace('111110', '11111')
-print("Unstuffed data:", unstuffed)
-conn.close()
-
-//SENDER
-import socket
-
-s = socket.socket()
-s.connect(('localhost', 6869))
-data = input("Enter binary data: ")
-stuffed = "01111110" + data.replace('11111', '111110') + "01111110"
-s.send(stuffed.encode())
-print("Stuffed data sent:", stuffed)
-s.close()`,
+Multi image view`,
     
-    button6: `n = int(input("Enter number of nodes: "))
-dmat = [[int(input(f"Cost between node {i+1} and node {j+1}: ")) for j in range(n)] for i in range(n)]
-dist = [dmat[i][:] for i in range(n)]
+    button6: `Log.i("ActivityLc", "onCreate() method");
+    }
 
-for _ in range(n-1):
-    for i in range(n):
-        for j in range(n):
-            dist[i][j] = min(dist[i][j], min(dist[i][k] + dist[k][j] for k in range(n)))
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.i("ActivityLc", "onStart() method");
+    }
 
-print("Distance table:")
-for i, row in enumerate(dist):
-    print(f"Node {i+1}: {row}")`,
-    
-    button7: `def xor(a, b):
-    return ''.join('0' if i == j else '1' for i, j in zip(a, b))
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.i("ActivityLc", "onResume() method");
+    }
 
-def crc(data, gen):
-    code = data + '0' * (len(gen) - 1)
-    for i in range(len(data)):
-        if code[i] == '1':
-            code = code[:i] + xor(code[i:i+len(gen)], gen) + code[i+len(gen):]
-    return code[-(len(gen)-1):]
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.i("ActivityLc", "onPause() method");
+    }
 
-data = input("Enter data: ")
-gen = input("Enter generator polynomial: ")
-transmitted = data + crc(data, gen)
-print("Transmitted code:", transmitted)
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.i("ActivityLc", "onStop() method");
+    }
 
-received = input("Enter received code to check for errors: ")
-print("No errors" if crc(received, gen) == '0' * (len(gen)-1) else "Errors detected")
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.i("ActivityLc", "onRestart() method");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.i("ActivityLc", "onDestroy() method");
+    }
+}
+
+Activity lifecycle
+`
+    button7: `Button b;
+    ConstraintLayout ly;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_main);
+        b = findViewById(R.id.rc);
+        ly = findViewById(R.id.l);
+        b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Random rn = new Random();
+                int r = rn.nextInt(256);
+                int g = rn.nextInt(256);
+                int b = rn.nextInt(256);
+                ly.setBackgroundColor(Color.rgb(r,g,b));
+            }
+        });
+    }
+}
+
+Button/Myapplication
+`
+button8: `CheckBox c1, c2, c3, c4 ;
+Button b;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_main);
+       c1 = findViewById(R.id.burger);
+       c2 = findViewById(R.id.pizza);
+       c3 = findViewById(R.id.noodles);
+       c4 = findViewById(R.id.dosa);
+       b = findViewById(R.id.menu);
+       b.setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View view) {
+               String li = "";
+               int amt = 0;
+               if (c1.isChecked()) {
+                   li = li + c1.getText().toString() + " ";
+                   amt = amt + 100;
+               }
+.
+.
+.
+Toast.makeText(MainActivity.this, li , Toast.LENGTH_SHORT).show();
+               Toast.makeText(MainActivity.this, amt +"", Toast.LENGTH_SHORT).show();    
+
+Checkbox
+
+`
+
+button9: `TextView tv;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_main);
+        tv = findViewById(R.id.t);
+        registerForContextMenu(tv);
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        getMenuInflater().inflate(R.menu.optionsmenu, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+        if(item.getItemId() == R.id.apple){
+            tv.setText("Apple selected");
+        } else if (item.getItemId() == R.id.banana) {
+            tv.setText("Banana selected");
+        }
+        else {
+            tv.setText("Mango selected");
+        }
+        return super.onContextItemSelected(item);
+    }
+}
+
+Context menu
+`
+
+button10: `ImageView iv;
+    Button b;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_main);
+        b = findViewById(R.id.capture);
+        iv = findViewById(R.id.i);
+        b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(i,1);
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == RESULT_OK){
+            Bitmap t = (Bitmap) data.getExtras().get("data");
+            iv.setImageBitmap(t);
+        }
+    }
+}
+
+Capture image
+`
+
+button11: `ImageView i;
+Button b;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_main);
+        i = findViewById(R.id.iv);
+        b = findViewById(R.id.ch);
+        b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                i.setImageResource(R.drawable.image);
+            }
+        });
+    }
+}
+
+Imageview
+`
+button12: `RadioGroup r;
+    ConstraintLayout cl;
+    Button b;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_main);
+        r = findViewById(R.id.rg);
+        cl = findViewById(R.id.ly);
+        b = findViewById(R.id.cb);
+
+        b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int i = r.getCheckedRadioButtonId();
+                if (i == R.id.red){
+                    cl.setBackgroundColor(Color.RED);
+                } else if (i == R.id.blue) {
+                    cl.setBackgroundColor(Color.BLUE);
+                }
+                else {
+                    cl.setBackgroundColor(Color.GREEN);
+                }
+            }
+        });
+    }
+}
+
+Radioand button
 `
 };
