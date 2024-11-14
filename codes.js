@@ -1,26 +1,25 @@
 const pythonCodes = {
-    button1: `Button s;
-EditText m, ph;
+    button1: `def sender():
+    res = ""
+    n = int(input("Enter number of frames: "))
+    for i in range(n):
+        frame = input(f"Enter frame {i + 1}: ")
+        res += f"{len(frame)}{frame}"
+    print(f"The final message is: {res}")
+    return res
 
-@Override
-protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    EdgeToEdge.enable(this);
-    setContentView(R.layout.activity_main);
-    m = findViewById(R.id.msg);
-    ph = findViewById(R.id.phone);
-    s = findViewById(R.id.send);
-    s.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            String me = m.getText().toString();
-            String p = ph.getText().toString();
-            SmsManager sms = SmsManager.getDefault();
-            sms.sendTextMessage(p, null, me, null, null);
-            Toast.makeText(MainActivity.this, "Message sent", Toast.LENGTH_SHORT).show();
-        }
-    });
-}
+def receiver(res):
+    i = 0
+    print("Received frames:")
+    while i < len(res):
+        len_frame = int(res[i])
+        i += 1
+        print(res[i:i + len_frame])
+        i += len_frame
+
+# Main function
+res = sender()
+receiver(res)
 `,
 
     button2: `Button b1, b2, b3, b4;
