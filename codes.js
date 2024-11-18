@@ -1,199 +1,371 @@
 const pythonCodes = {
-    button1: `def sender():
-    res = ""
-    n = int(input("Enter number of frames: "))
-    for i in range(n):
-        frame = input(f"Enter frame {i + 1}: ")
-        res += f"{len(frame)}{frame}"
-    print(f"The final message is: {res}")
-    return res
+    button1: `#include "ns3/core-module.h"
+#include "ns3/network-module.h"
+#include "ns3/internet-module.h"
+#include "ns3/point-to-point-module.h"
+#include "ns3/applications-module.h"
+#include "ns3/netanim-module.h"
+// Default Network Topology
+//
+//       10.1.1.0
+// n0 -------------- n1
+//    point-to-point
+//
+ 
+using namespace ns3;
 
-def receiver(res):
-    i = 0
-    print("Received frames:")
-    while i < len(res):
-        len_frame = int(res[i])
-        i += 1
-        print(res[i:i + len_frame])
-        i += len_frame
+NS_LOG_COMPONENT_DEFINE ("FirstScriptExample");
 
-# Main function
-res = sender()
-receiver(res)
+int
+main (int argc, char *argv[])
+{
+  CommandLine cmd (__FILE__);
+  cmd.Parse (argc, argv);
+  
+  std::string animFile="FirstLab.xml";
+  Time::SetResolution (Time::NS);
+  LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO);
+  LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO);
+
+  NodeContainer nodes;
+  nodes.Create (2);
+
+  PointToPointHelper pointToPoint;
+  pointToPoint.SetDeviceAttribute ("DataRate", StringValue ("5Mbps"));
+  pointToPoint.SetChannelAttribute ("Delay", StringValue ("2ms"));
+
+  NetDeviceContainer devices;
+  devices = pointToPoint.Install (nodes);
+
+  InternetStackHelper stack;
+  stack.Install (nodes);
+
+  Ipv4AddressHelper address;
+  address.SetBase ("10.1.1.0", "255.255.255.0");
+
+  Ipv4InterfaceContainer interfaces = address.Assign (devices);
+
+  UdpEchoServerHelper echoServer (9);
+
+  ApplicationContainer serverApps = echoServer.Install (nodes.Get (1));
+  serverApps.Start (Seconds (1.0));
+  serverApps.Stop (Seconds (10.0));
+
+  UdpEchoClientHelper echoClient (interfaces.GetAddress (1), 9);
+  echoClient.SetAttribute ("MaxPackets", UintegerValue (1));
+  echoClient.SetAttribute ("Interval", TimeValue (Seconds (1.0)));
+  echoClient.SetAttribute ("PacketSize", UintegerValue (1024));
+
+  ApplicationContainer clientApps = echoClient.Install (nodes.Get (0));
+  clientApps.Start (Seconds (2.0));
+  clientApps.Stop (Seconds (10.0));
+  
+  AnimationInterface anim(animFile);
+  anim.SetConstantPosition(nodes.Get(0),10,20); //   SetConstantPosition(nodes, x,y)
+  anim.SetConstantPosition(nodes.Get(1),50,60);
+  
+   Simulator::Stop (Seconds(20.0)); 
+
+  Simulator::Run ();
+  Simulator::Destroy ();
+  return 0;
+}
 `,
 
-    button2: `
-def bit_stuffing(data):
-    stuffed_data = ""
-    count = 0
-    for bit in data:
-        if bit == '1':
-            count += 1
-            stuffed_data += bit
-        else:
-            count = 0
-            stuffed_data += bit
-        if count == 5:
-            stuffed_data += '0'  
-            count = 0
-    return stuffed_data
+    button2: `#include "ns3/core-module.h"
+#include "ns3/network-module.h"
+#include "ns3/internet-module.h"
+#include "ns3/point-to-point-module.h"
+#include "ns3/csma-module.h"
+#include "ns3/applications-module.h"
+#include "ns3/ipv4-global-routing-helper.h"
+#include "ns3/netanim-module.h"
 
-# Bit decoding function
-def bit_decoding(stuffed_data):
-    decoded_data = ""
-    count = 0
-    for bit in stuffed_data:
-        if bit == '1':
-            count += 1
-            decoded_data += bit
-        else:
-            if count == 5:
-                
-                count = 0
-                continue
-            count = 0
-            decoded_data += bit
-    return decoded_data
+// Default Network Topology
+//
+//       10.1.1.0
+// n0 -------------- n1   n2   n3   n4
+//    point-to-point  |    |    |    |
+//                    ================
+//                      LAN 10.1.2.0
 
-data = input("Enter the data (binary string): ")
-stuffed_data = bit_stuffing(data)
-print("Data after bit stuffing:", stuffed_data)
-decoded_data = bit_decoding(stuffed_data)
-print("Data after bit decoding:", decoded_data)
 
+using namespace ns3;
+int main ()
+{
+  LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO);
+  LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO);
+    std::string animFile="second.xml";
+  
+  NodeContainer p2pNodes;
+  p2pNodes.Create (2);
+
+  NodeContainer csmaNodes;
+  csmaNodes.Add (p2pNodes.Get (1));
+  csmaNodes.Create (3);
+
+  PointToPointHelper pointToPoint;
+  pointToPoint.SetDeviceAttribute ("DataRate", StringValue ("5Mbps"));
+  pointToPoint.SetChannelAttribute ("Delay", StringValue ("2ms"));
+
+  NetDeviceContainer p2pDevices;
+  p2pDevices = pointToPoint.Install (p2pNodes);
+
+  CsmaHelper csma;
+  csma.SetChannelAttribute ("DataRate", StringValue ("100Mbps"));
+  csma.SetChannelAttribute ("Delay",  StringValue ("2ms"));
+
+  NetDeviceContainer csmaDevices;
+  csmaDevices = csma.Install (csmaNodes);
+
+  InternetStackHelper stack;
+  stack.Install (p2pNodes.Get (0));
+  stack.Install (csmaNodes);
+
+  Ipv4AddressHelper address;
+  address.SetBase ("10.1.1.0", "255.255.255.0");
+  Ipv4InterfaceContainer p2pInterfaces = address.Assign (p2pDevices);
+
+  address.SetBase ("10.1.2.0", "255.255.255.0");
+  Ipv4InterfaceContainer csmaInterfaces = address.Assign (csmaDevices);
+
+  UdpEchoServerHelper echoServer (9);
+
+  ApplicationContainer serverApps = echoServer.Install (csmaNodes.Get (3));
+  serverApps.Start (Seconds (1.0));
+  serverApps.Stop (Seconds (10.0));
+
+  UdpEchoClientHelper echoClient (csmaInterfaces.GetAddress (3), 9);
+  echoClient.SetAttribute ("MaxPackets", UintegerValue (1));
+  echoClient.SetAttribute ("Interval", TimeValue (Seconds (1.0)));
+  echoClient.SetAttribute ("PacketSize", UintegerValue (1024));
+
+  ApplicationContainer clientApps = echoClient.Install (p2pNodes.Get (0));
+  clientApps.Start (Seconds (2.0));
+  clientApps.Stop (Seconds (10.0));
+
+  Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
+  AnimationInterface anim(animFile);
+  anim.SetConstantPosition(p2pNodes.Get(0),1.0,2.0);
+  anim.SetConstantPosition(csmaNodes.Get(0),45.0,60.0);
+  anim.SetConstantPosition(csmaNodes.Get(1),55.0,60.0);
+  anim.SetConstantPosition(csmaNodes.Get(2),65.0,60.0);
+  anim.SetConstantPosition(csmaNodes.Get(3),75.0,60.0);
+ 
+  AsciiTraceHelper ascii;
+  pointToPoint.EnableAsciiAll(ascii.CreateFileStream("second.tr"));
+  csma.EnableAsciiAll(ascii.CreateFileStream("second1.tr"));
+
+  Simulator::Run ();
+  Simulator::Destroy ();
+  return 0;
+}
 `,
 
-    button3: `def div(num1, num2):
-    n = len(num2)
-    result = num1[:n]
-    rem = ""
-    
-    
-    for i in range(len(num2)):
-        if result[i] == num2[i]:
-            rem += "0"
-        else:
-            rem += "1"
+    button3: `#include "ns3/core-module.h"
+#include "ns3/network-module.h"
+#include "ns3/csma-module.h"
+#include "ns3/internet-module.h"
+#include "ns3/point-to-point-module.h"
+#include "ns3/applications-module.h"
+#include "ns3/ipv4-global-routing-helper.h"
+#include "ns3/netanim-module.h"
 
-    while n < len(num1):
-        if rem[0] == '0':
-            rem = rem[1:] + num1[n]
-        else:
-            rem = rem[1:] + num1[n]
-            rem = div(rem, num2)
-        n += 1
-    
-    result = rem
-    rem = ""
-    for i in range(len(num2)):
-        if result[i] == num2[i]:
-            rem += "0"
-        else:
-            rem += "1"
-    return rem[1:]
+// Default Network Topology
+//
+//    csma 10.1.1.0
+//    ------------ 
+//     |  |  |  |     
+//    n0 n1 n2 n3
+ 
+using namespace ns3;
 
-def main():
-    gen = input("Enter Generator: ")
-    data = input("Enter Data: ")
-    code = data
 
-    
-    while len(code) < (len(data) + len(gen) - 1):
-        code += "0"
-    
-    
-    code = data + div(code, gen)
-    print("Transmitted code word:", code)
-    
-    
-    rec = input("Please Enter the received code: ")
-    if int(div(rec, gen)) == 0:
-        print("The received code word contains no errors")
-    else:
-        print("The received code word contains errors")
 
-if __name__ == "__main__":
-    main()
+int main ()
+{
+ 
+ 
+  LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO);
+  LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO);
+  std:: string animFile="third.xml";
+       
+ 
+  NodeContainer csmaNodes;
+  csmaNodes.Create (4);
 
+ 
+  CsmaHelper csma;
+  csma.SetChannelAttribute ("DataRate", StringValue ("5Mbps"));
+  csma.SetChannelAttribute ("Delay", StringValue ("2ms"));
+ 
+  NetDeviceContainer csmaDevices;
+  csmaDevices = csma.Install (csmaNodes);
+
+  InternetStackHelper stack;
+  stack.Install (csmaNodes);
+
+  Ipv4AddressHelper address;
+ 
+  address.SetBase ("10.1.1.0", "255.255.255.0");
+  Ipv4InterfaceContainer csmaInterfaces = address.Assign (csmaDevices);
+
+  UdpEchoServerHelper echoServer (9);
+
+  ApplicationContainer serverApps = echoServer.Install (csmaNodes.Get (3));
+  serverApps.Start (Seconds (1.0));
+  serverApps.Stop (Seconds (10.0));
+
+  UdpEchoClientHelper echoClient (csmaInterfaces.GetAddress (3), 9);
+  echoClient.SetAttribute ("MaxPackets", UintegerValue (1));
+  echoClient.SetAttribute ("Interval", TimeValue (Seconds (1.0)));
+  echoClient.SetAttribute ("PacketSize", UintegerValue (1024));
+ 
+  ApplicationContainer clientApps = echoClient.Install (csmaNodes.Get (0));
+  clientApps.Start (Seconds (2.0));
+  clientApps.Stop (Seconds (10.0));
+
+  Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
+  AnimationInterface anim(animFile);
+  anim.SetConstantPosition(csmaNodes.Get(0), 45.0, 60.0);
+  anim.SetConstantPosition(csmaNodes.Get(1), 55.0, 60.0);
+  anim.SetConstantPosition(csmaNodes.Get(2), 65.0, 60.0);
+  anim.SetConstantPosition(csmaNodes.Get(3), 75.0, 60.0);
+
+   AsciiTraceHelper ascii;
+   csma.EnableAsciiAll(ascii.CreateFileStream("third.tr"));
+ 
+  Simulator::Run ();
+  Simulator::Destroy ();
+  return 0;
+}
 `,
 
-    button4: `def distance_vector_routing():
-    
-    n = int(input("Enter the number of nodes: "))
-    
-    
-    dmat = []
-    print("Enter the cost matrix:")
-    for i in range(n):
-        row = list(map(int, input(f"Row {i+1}: ").split()))
-        row[i] = 0  # Set distance to self as 0
-        dmat.append(row)
-    
-    
-    dist = [[dmat[i][j] for j in range(n)] for i in range(n)]
-    via = [[j for j in range(n)] for i in range(n)]
-    
-    
-    updated = True
-    while updated:
-        updated = False
-        for i in range(n):
-            for j in range(n):
-                for k in range(n):
-                    # If a shorter path is found, update the distance and path
-                    if dist[i][j] > dmat[i][k] + dist[k][j]:
-                        dist[i][j] = dmat[i][k] + dist[k][j]
-                        via[i][j] = k
-                        updated = True
-    
-    
-    for i in range(n):
-        print(f"\nRouting table for node {i + 1}:")
-        for j in range(n):
-            print(f" To node {j + 1} via {via[i][j] + 1} with distance {dist[i][j]}")
+    button4: `#include "ns3/core-module.h"
+#include "ns3/network-module.h"
+#include "ns3/csma-module.h"
+#include "ns3/applications-module.h"
+#include "ns3/internet-apps-module.h"
+#include "ns3/internet-module.h"
+#include "ns3/netanim-module.h"
+//              n0        n1        n2
+//              |         |         |
+//              ----------------------
+//                  10.0.1.0
+
+using namespace ns3;
 
 
-if __name__ == "__main__":
-    distance_vector_routing()
+int
+main ()
+{
+ std::string animFile="fourth.xml";
 
+  NodeContainer nodes;
+  nodes.Create (3);
+ 
+  CsmaHelper csma;
+  csma.SetChannelAttribute ("DataRate", DataRateValue (DataRate (5000000)));
+  csma.SetChannelAttribute ("Delay", TimeValue (MilliSeconds (2)));
+  NetDeviceContainer devs = csma.Install (nodes);
+
+
+  InternetStackHelper ipStack;
+  ipStack.Install (nodes);
+
+
+  Ipv4AddressHelper ip;
+  ip.SetBase ("10.0.1.0", "255.255.255.0");
+  Ipv4InterfaceContainer interface = ip.Assign (devs);
+  
+ 
+
+  V4PingHelper ping = V4PingHelper (interface.GetAddress (2));
+  NodeContainer pingers;
+  pingers.Add (nodes.Get (0));
+  pingers.Add (nodes.Get (1));
+  ApplicationContainer apps = ping.Install (pingers);
+  apps.Start (Seconds (2.0));
+  apps.Stop (Seconds (5.0));
+
+
+  csma.EnablePcapAll ("csma-ping", true);
+  
+   AnimationInterface anim(animFile);
+  anim.SetConstantPosition(nodes.Get(0),10.0,60.0);
+  anim.SetConstantPosition(nodes.Get(1),10.0,100.0);
+  anim.SetConstantPosition(nodes.Get(2),50.0,60.0);
+  
+ 
+  Simulator::Run ();
+  Simulator::Destroy ();
+}
 `,
 
     button5: `
-import java.util.*;
-public class leakybucket {
-public static void flow(int pktsize , int output){
-int bucketsize=512;
-if(pktsize>bucketsize) {
-System.out.println("Bucket overflow");
-}else {
-try {
-Thread.sleep(10);
-while(pktsize>output) {
-System.out.println(output+"bytes outflow ");
-pktsize=pktsize-output;
-}
-if(pktsize>0) {
-System.out.println(pktsize+"bytes outflow");
-}
-}catch(InterruptedException e) {
-System.out.println("Interrupted");
-}
-}
-}
-public static void main(String[]args) {
-int output,pktsize,n;
-Scanner input = new Scanner (System.in);
-Random rand = new Random();
-System.out.println("Enter output rate ");
-output=input.nextInt();
-System.out.println("Enter the number of packets");
-n=input.nextInt();
-for(int i=1;i<=n;i++) {
-pktsize=rand.nextInt(1000);
-System.out.println("packet no:"+i+"packet size="+pktsize);
-flow(pktsize,output);
-}
-}
+#include "ns3/core-module.h"
+#include "ns3/network-module.h"
+#include "ns3/netanim-module.h"
+#include "ns3/internet-module.h"
+#include "ns3/point-to-point-module.h"
+#include "ns3/applications-module.h"
+#include "ns3/point-to-point-layout-module.h"
+ 
+// Network topology (default)
+//
+//        n2 n3 n4              .
+//         \ | /                .
+//          \|/                 .
+//     n1--- n0---n5            .
+//          /|\                 .
+//         / | \                .
+//        n8 n7 n6              .
+//
+ 
+ 
+using namespace ns3;
+ 
+int main ()
+{
+ 
+ 
+  std::string animFile="fifth.xml";
+ 
+  
+  
+  PointToPointHelper pointToPoint;
+  pointToPoint.SetDeviceAttribute ("DataRate", StringValue ("5Mbps"));
+  pointToPoint.SetChannelAttribute ("Delay", StringValue ("2ms"));
+  PointToPointStarHelper star (8, pointToPoint);
+  
+ 
+ 
+  InternetStackHelper stack;
+  star.InstallStack (stack);
+ 
+  
+  star.AssignIpv4Addresses (Ipv4AddressHelper ("10.1.1.0", "255.255.255.0"));
+  Address hubLocalAddress (InetSocketAddress (Ipv4Address::GetAny (),50000 ));
+  PacketSinkHelper packetSinkHelper ("ns3::TcpSocketFactory", hubLocalAddress);
+  ApplicationContainer hubApp = packetSinkHelper.Install (star.GetHub ());
+  hubApp.Start (Seconds (1.0));
+  hubApp.Stop (Seconds (10.0));
+ 
+  
+  
+ 
+  
+  pointToPoint.EnablePcapAll ("star");
+  AnimationInterface anim(animFile);
+  anim.SetConstantPosition(star.GetHub(),10.0,60.0);
+
+ 
+  
+  Simulator::Run ();
+  Simulator::Destroy ();
+  
+ 
+  return 0;
 }
 `,
 
